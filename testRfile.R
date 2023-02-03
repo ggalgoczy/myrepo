@@ -8,3 +8,4 @@ head(AAPL)
 class(AAPL)
 chart_Series(AAPL)
 chart_Series(AAPL['2022-10-01/2022-10-29'])
+

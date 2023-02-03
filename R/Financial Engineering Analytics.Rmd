@@ -1,0 +1,10 @@
+---
+title: "Financial Engineer Analytics"
+author: "Gabor Galgoczy"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+This file is the summary of everyting I read in the Financial Engineering Analytics article, link:
+https://bookdown.org/wfoote01/faur/
+
