@@ -181,3 +181,21 @@ test <- applyIndicators(strategy = strategy.st, mktdata = OHLC(SPY))
 
 # Subset your data between Sep. 1 and Sep. 5 of 2013
 test_subset <- test["2013-09-01/2013-09-05"]
+
+
+###############ADDING SIGNALS##################################
+#with the following function i can create a filter for which scenarios the algo should look for entries
+
+# Add a sigComparison which specifies that SMA50 must be greater than SMA200, call it longfilter
+add.signal(strategy.st, name = "sigComparison", 
+           
+           # We are interested in the relationship between the SMA50 and the SMA200
+           arguments = list(columns = c("SMA50", "SMA200"), 
+                            
+                            # Particularly, we are interested when the SMA50 is greater than the SMA200
+                            relationship = "gt"),
+           
+           # Label this signal longfilter
+           label = "longfilter")
+
+
