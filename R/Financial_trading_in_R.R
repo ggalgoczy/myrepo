@@ -187,6 +187,7 @@ test_subset <- test["2013-09-01/2013-09-05"]
 #with the following function i can create a filter for which scenarios the algo should look for entries
 
 # Add a sigComparison which specifies that SMA50 must be greater than SMA200, call it longfilter
+#with this, the function will always check whether the sma50 is  above sma200 and state if the condition holds
 add.signal(strategy.st, name = "sigComparison", 
            
            # We are interested in the relationship between the SMA50 and the SMA200
@@ -197,5 +198,45 @@ add.signal(strategy.st, name = "sigComparison",
            
            # Label this signal longfilter
            label = "longfilter")
+
+##now i will add a signal that indicates if the sma50 is below the sma200 but only for the 1st time the condition applies
+
+# Add a sigCrossover which specifies that the SMA50 is less than the SMA200 and label it filterexit
+add.signal(strategy.st, name = "sigCrossover",
+           
+           # We're interested in the relationship between the SMA50 and the SMA200
+           arguments = list(columns = c("SMA50", "SMA200"),
+                            
+                            # The relationship is that the SMA50 crosses under the SMA200
+                            relationship = "lt"),
+           
+           # Label it filterexit
+           label = "filterexit")
+
+##the sigThreshold function can be used with oscillator types of indicators to check where they are compared to a given
+## threshold.
+##If i set the cross parameter to FALSE then the function acts like a sigComparison, so it always compares the value 
+##of the indicator to a value always
+## with cross=TRUE, it acts as sigCrossover function
+
+##so with sigThreshold and cross=FALSE i could make a 'switch' that needs to be on, for entering a position
+
+# Implement a sigThreshold which specifies that DVO_2_126 must be less than 20, label it longthreshold
+add.signal(strategy.st, name = "sigThreshold", 
+           
+           # Use the DVO_2_126 column
+           arguments = list(column = "DVO_2_126", 
+                            
+                            # The threshold is 20
+                            threshold = 20, 
+                            
+                            # We want the oscillator to be under this value
+                            relationship = "lt", 
+                            
+                            # We're interested in every instance that the oscillator is less than 20
+                            cross = FALSE), 
+           
+           # Label it longthreshold
+           label = "longthreshold")
 
 
