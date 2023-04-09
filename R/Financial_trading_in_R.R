@@ -239,4 +239,108 @@ add.signal(strategy.st, name = "sigThreshold",
            # Label it longthreshold
            label = "longthreshold")
 
+# Add a sigThreshold signal to your strategy that specifies that DVO_2_126 must cross above 80 and label it thresholdexit
+add.signal(strategy.st, name = "sigThreshold", 
+           
+           # Reference the column of DVO_2_126
+           arguments = list(column = "DVO_2_126", 
+                            
+                            # Set a threshold of 80
+                            threshold = 80, 
+                            
+                            # The oscillator must be greater than 80
+                            relationship = "gt", 
+                            
+                            # We are interested only in the cross
+                            cross = TRUE), 
+           
+           # Label it thresholdexit
+           label = "thresholdexit")
 
+##################################sigFormula######################################
+#In this exercise, you will get a taste of what the sigFormula function can do by stepping through the 
+#logic manually. You will need to use the applyIndicators() and applySignals() functions.
+
+# Create your dataset: test (testing what i have so far)
+test_init <- applyIndicators(strategy.st, mktdata = OHLC(SPY))
+test <- applySignals(strategy = strategy.st, mktdata = test_init)
+
+
+
+# Add a sigFormula signal to your code specifying that both longfilter and longthreshold must be TRUE, label it longentry
+add.signal(strategy.st, name = "sigFormula",
+           
+           # Specify that longfilter and longthreshold must be TRUE
+           arguments = list(formula = "longfilter & longthreshold", 
+                            
+                            # Specify that cross must be TRUE
+                            cross = TRUE),
+           
+           # Label it longentry
+           label = "longentry")
+
+##########################RULES################################
+#rules are for setting how to enter and exit into positions based on the indicators and signals
+
+# Fill in the rule's type as exit
+add.rule(strategy.st, name = "ruleSignal", 
+         arguments = list(sigcol = "filterexit", sigval = TRUE, orderqty = "all", 
+                          ordertype = "market", orderside = "long", 
+                          replace = FALSE, prefer = "Open"), 
+         type = "exit")
+#replace: should other signals be cancelled?
+#in general it should be left false
+
+#prefer: when to enter a position
+#the position will be entered in the next candle once the signals are present and with the prefer we can say
+#at which position it should enter. open means at the Open price
+
+#replace: In quantstrat, the replace argument specifies whether or not to ignore all other signals on the 
+#same date when the strategy acts upon one signal. This is generally not a desired quality in a well-crafted 
+#trading system. Therefore, for your exit rule, you should set replace to FALSE.
+
+
+#Using add.rule() to implement an entry rule
+
+# Create an entry rule of 1 share when all conditions line up to enter into a position
+add.rule(strategy.st, name = "ruleSignal", 
+         
+         # Use the longentry column as the sigcol
+         arguments=list(sigcol = "longentry", 
+                        
+                        # Set sigval to TRUE
+                        sigval = TRUE, 
+                        
+                        # Set orderqty to 1
+                        orderqty = 1,
+                        
+                        # Use a market type of order
+                        ordertype = "market",
+                        
+                        # Take the long orderside
+                        orderside = "long",
+                        
+                        # Do not replace other signals
+                        replace = FALSE, 
+                        
+                        # Buy at the next day's opening price
+                        prefer = "Open"),
+         
+         # This is an enter type rule, not an exit
+         type = "enter")
+
+############
+# Add a rule that uses an osFUN to size an entry position
+add.rule(strategy = strategy.st, name = "ruleSignal",
+         arguments = list(sigcol = "longentry", sigval = TRUE, ordertype = "market",
+                          orderside = "long", replace = FALSE, prefer = "Open",
+                          
+                          # Use the osFUN called osMaxDollar
+                          osFUN = osMaxDollar,
+                          
+                          # The tradeSize argument should be equal to tradesize (defined earlier)
+                          tradeSize = tradesize,
+                          
+                          # The maxSize argument should be equal to tradesize as well
+                          maxSize = tradesize),
+         type = "enter")
